@@ -1,10 +1,11 @@
 #!/usr/bin/env wolframscript
-Print @ "Wolfram Expression Server 0.0.1 (alpha)";
-Print @ "Usage: wolframserver.wls [port]\n";
+Print @ "Wolfram Expression Server 0.0.2 (alpha-s4m13337)";
+Print @ "Usage: wolframserver.wls [address]";
+Print @ "Exit with x -> Return";
 
-If[ Length[$ScriptCommandLine] == 2, port = ToExpression @ Part[$ScriptCommandLine,2], port = 5858 ];
+If[ Length[$ScriptCommandLine] >= 2, port = ToExpression @ Part[$ScriptCommandLine,2], address = "127.0.0.1:5858" ];
 
-Print["Port:       ", port];
+Print["Address:       ", address];
 Print["$ProcessID: ", $ProcessID];
 
 ApacheDateString[] := With[{tz = StringReplace[DateString["ISOTimeZone"], ":" -> ""]},
@@ -13,7 +14,7 @@ ApacheDateString[] := With[{tz = StringReplace[DateString["ISOTimeZone"], ":" ->
 ApacheLog[ str_String ] := Module[{}, Print[ "127.0.0.1 - - " <> ApacheDateString[] <> " \"POST / HTTP/1.1\" 200 " <> StringTrim[str] ] ];
 
 listener = SocketListen[
-  port,
+  address,
   Function[{assoc},
     With[{
       client = assoc["SourceSocket"],
@@ -40,6 +41,5 @@ url = URLBuild[<|"Scheme" -> "http", "Domain" -> First[listener["Socket"]["Desti
 
 Print["Listening:  ", url, "\n"];
 
-task = ZeroMQLink`Private`$AsyncState["Task"];
-WaitAsynchronousTask[task];
-Print["Exiting..."];
+While[True, If[InputString[] == "x", Print["Exiting..."]; Exit[]]]
+
