@@ -3,7 +3,7 @@ Print @ "Wolfram Expression Server 0.0.2 (alpha-s4m13337)";
 Print @ "Usage: wolframserver.wls [address]";
 Print @ "Exit with x -> Return";
 
-If[ Length[$ScriptCommandLine] >= 2, port = ToExpression @ Part[$ScriptCommandLine,2], address = "127.0.0.1:5858" ];
+address = If[ Length[$ScriptCommandLine] >= 2, Part[$ScriptCommandLine, 2], "127.0.0.1:5858" ];
 
 Print["Address:       ", address];
 Print["$ProcessID: ", $ProcessID];
@@ -37,7 +37,7 @@ listener = SocketListen[
    ]
   ];
 
-url = URLBuild[<|"Scheme" -> "http", "Domain" -> First[listener["Socket"]["DestinationIPAddress"]], "Port" -> listener["Socket"]["DestinationPort"]|>];
+url = URLBuild[<|"Scheme" -> "http", "Domain" -> listener["Socket"]["DestinationIPAddress"], "Port" -> listener["Socket"]["DestinationPort"]|>];
 
 Print["Listening:  ", url, "\n"];
 
