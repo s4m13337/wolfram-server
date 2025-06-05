@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WL Notebook</title>
+    <style>
+        #container{
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .cell-input, .cell-output {
+            display: flex;
+            align-items: center;    /* Vertically center cell label with cell content */
+            gap: 10px;    /* Gap between the cell label and cell content */
+            margin: 20px;    /* Space around cell */
+        }
+
+        .cell-input span, .cell-output span {
+            font-family: monospace;
+            white-space: nowrap;    /* Ensures label stays on single line */
+        }
+
+        .editable-cell {
+            background: #eee;
+            width: 100%; /* Make the cell content span full width */
+            font-family: monospace;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script>
+        var container = document.querySelector("#container")
+        var cellCount = 1
+        createNewCell(cellCount)
+
+        function evaluateWL(event){
+            if(event.shiftKey && event.key == "Enter"){
+                event.preventDefault() // Prevent new line
+                
+                inValue = document.querySelector(`#cell-in-${cellCount}-content`).innerText.trim()
+                cellOut = document.querySelector(`#cell-out-${cellCount}-content`)
+
+                cellOut.innerHTML = inValue
+                document.querySelector(`#cell-out-${cellCount}`).style.display = "block";
+                console.log("Evaluated", inValue) 
+                createNewCell(++cellCount)
+            }
+        }
+
+        /**
+         * Function to create a new cell
+         */ 
+        function createNewCell(cellId){
+            const newCell = document.createElement("div")
+            newCell.id = `cell-${cellId}`
+
+            // Input cell
+            const newCellIn = document.createElement("div")
+            newCellIn.id = `cell-in-${cellId}`
+            newCellIn.classList.add("cell-input")
+            // Input cell label
+            const newCellInLabel = document.createElement("span");
+            newCellInLabel.textContent = `In[${cellId}] := `;
+            // Input cell content
+            const newCellInContent = document.createElement("div")
+            newCellInContent.id = `cell-in-${cellId}-content`
+            newCellInContent.contentEditable = "true"
+            newCellInContent.classList.add("editable-cell");
+            newCellInContent.setAttribute("onkeypress", "evaluateWL(event)")   
+
+            newCellIn.appendChild(newCellInLabel)
+            newCellIn.appendChild(newCellInContent)
+
+            // Output cell
+            const newCellOut = document.createElement("div")
+            newCellOut.id =`cell-out-${cellId}`
+            newCellOut.classList.add("cell-output")
+            newCellOut.style.display = "none" // Keep the output cell initially hidden
+            // Output cell label
+            const newCellOutLabel = document.createElement("span");
+            newCellOutLabel.textContent = `Out[${cellId}] := `
+            // Output cell content
+            const newCellOutContent = document.createElement("span")
+            newCellOutContent.id = `cell-out-${cellId}-content`
+
+            newCellOut.appendChild(newCellOutLabel)
+            newCellOut.appendChild(newCellOutContent)
+
+            newCell.appendChild(newCellIn)
+            newCell.appendChild(newCellOut)
+            container.appendChild(newCell)
+            newCellInContent.focus()
+        }
+        
+    </script>
+</body>
+</html>
